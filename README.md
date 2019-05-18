@@ -63,32 +63,54 @@ $ a2ml command --help
 
 ## Configuration Options
 
-After a new A2ML application created, application configuration stored in CONFIG.YAML. The options available include:
+After a new A2ML experiment is created, the overall experiment configuration
+that applies to all providers is stored in CONFIG.YAML. The options available in the include:
+
 * name - the name of the experiment
-* provider - the AutoML provider: GC (for Google Cloud), AZ (for Microsoft Azure), or Auger
-* project - the name of the project in the AutoML provider's environment
-* region - the compute region on the cloud provider
 * source - the CSV file to train with
-* dataset_id - the Google Cloud dataset after source import
 * target - the feature which is the target
 * exclude - features to exclude from the model
-* metric - how to measure the accuracy of the model
 * budget - the time budget in milliseconds to train 
+* providers - list of AutoML providers: gooogle (for Google Cloud), azure (for Microsoft Azure), or auger
 
-Here is an example CONFIG.YAML for Google Cloud AutoML:
-
+Below is an example CONFIG.YAML:
 ```
 name: moneyball
-provider: GC
-project: automl-test-237311
-region: us-central1
-source: gs://moneyball/baseball.csv
-dataset_id: TBL4772768869943083008
+source: https://storage.cloud.google.com/moneyball/baseball.csv?folder&organizationId=465405141758&_ga=2.120546504.-1320989109.1554983622
 target: RS
 exclude: Team,League,Year
-metric: MINIMIZE_MAE
 budget: 3600
+providers: google, azure 
 ```
+
+### Google AutoML Tables Configuration
+Some options are specified to certain providers. For Google AutoML Tables here
+are the available options:
+
+* metric - How to measure the accuracy of the model. For classification select from: MAXIMIZE_AU_ROC, MINIMIZE_LOG_LOSS, MAXIMIZE_AU_PRC. For regression select from: MINIMIZE_RMSE, MINIMIZE_MAE, MINIMIZE_RMSLE. See more at (Google AutoML Model Optimization)[https://cloud.google.com/automl-tables/docs/models]
+* region - the compute region on Google Cloud: defaults to "us-central1"
+* project - the name of the project in Google Cloud
+* dataset_id - the Google Cloud dataset after source import, will be persisted to GOOGLE.YAML after import data
+
+Here is a sample GOOGLE.YAML file:
+```
+region: us-central1
+metric: MINIMIZE_MAE
+project: automl-test-237311
+```
+
+### Azure AutoML Configuration
+
+Azure's configuration options are:
+* region - Azure compute region. Default is eastus2
+* metric - For classification: accuracy, AUC_weighted, average_precision_score_weighted, norm_macro_recall, precision_score_weighted. For regression: spearman_correlation, normalized_root_mean_squared_error, r2_score, normalized_mean_absolute_error. For time series: spearman_correlation, normalized_root_mean_squared_error, r2_score, normalized_mean_absolute_error. 
+
+Here's an example AZURE.YAML file:
+```
+metric: spearman_correlation
+region: eastus2
+```
+### Auger AutoML Configuration
 
 ## Development Setup
 
